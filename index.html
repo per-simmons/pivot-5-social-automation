@@ -13,7 +13,7 @@
 
     body {
       font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif;
-      background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+      background: #ffffff;
       min-height: 100vh;
       display: flex;
       align-items: center;
@@ -23,23 +23,30 @@
 
     .container {
       background: white;
-      border-radius: 20px;
+      border: 1px solid #e5e5e5;
+      border-radius: 8px;
       padding: 40px;
-      box-shadow: 0 20px 60px rgba(0, 0, 0, 0.3);
-      max-width: 600px;
+      max-width: 500px;
       width: 100%;
     }
 
+    .logo {
+      width: 120px;
+      margin-bottom: 30px;
+    }
+
     h1 {
-      font-size: 28px;
+      font-size: 24px;
       margin-bottom: 10px;
-      color: #2d3748;
+      color: #000000;
+      font-weight: 600;
     }
 
     p {
-      color: #718096;
+      color: #666666;
       margin-bottom: 30px;
-      line-height: 1.6;
+      line-height: 1.5;
+      font-size: 14px;
     }
 
     .input-group {
@@ -49,60 +56,59 @@
     label {
       display: block;
       margin-bottom: 8px;
-      color: #4a5568;
+      color: #000000;
       font-weight: 500;
-      font-size: 14px;
+      font-size: 13px;
     }
 
     input {
       width: 100%;
       padding: 12px 16px;
-      border: 2px solid #e2e8f0;
-      border-radius: 8px;
+      border: 1px solid #d4d4d4;
+      border-radius: 6px;
       font-size: 14px;
       transition: border-color 0.2s;
     }
 
     input:focus {
       outline: none;
-      border-color: #667eea;
+      border-color: #000000;
     }
 
     button {
       width: 100%;
       padding: 16px;
-      background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+      background: #ff6b35;
       color: white;
       border: none;
-      border-radius: 10px;
-      font-size: 16px;
-      font-weight: 600;
+      border-radius: 6px;
+      font-size: 15px;
+      font-weight: 500;
       cursor: pointer;
-      transition: transform 0.2s, box-shadow 0.2s;
+      transition: background 0.2s;
       margin-bottom: 10px;
     }
 
     button:hover {
-      transform: translateY(-2px);
-      box-shadow: 0 10px 20px rgba(102, 126, 234, 0.3);
+      background: #ff5722;
     }
 
     button:active {
-      transform: translateY(0);
+      background: #e64a19;
     }
 
     button:disabled {
       opacity: 0.5;
       cursor: not-allowed;
-      transform: none;
     }
 
     .status {
       padding: 16px;
-      border-radius: 8px;
+      border-radius: 6px;
       margin-top: 20px;
       display: none;
       animation: slideIn 0.3s ease-out;
+      font-size: 14px;
     }
 
     @keyframes slideIn {
@@ -117,29 +123,29 @@
     }
 
     .status.success {
-      background: #c6f6d5;
-      color: #22543d;
-      border: 1px solid #9ae6b4;
+      background: #f0f0f0;
+      color: #000000;
+      border: 1px solid #d4d4d4;
     }
 
     .status.error {
-      background: #fed7d7;
-      color: #742a2a;
-      border: 1px solid #fc8181;
+      background: #fff5f5;
+      color: #000000;
+      border: 1px solid #ff6b35;
     }
 
     .status.loading {
-      background: #bee3f8;
-      color: #2c5282;
-      border: 1px solid #90cdf4;
+      background: #f0f0f0;
+      color: #000000;
+      border: 1px solid #d4d4d4;
     }
 
     .spinner {
       display: inline-block;
       width: 14px;
       height: 14px;
-      border: 2px solid rgba(44, 82, 130, 0.3);
-      border-top-color: #2c5282;
+      border: 2px solid #d4d4d4;
+      border-top-color: #000000;
       border-radius: 50%;
       animation: spin 0.8s linear infinite;
       margin-right: 8px;
@@ -157,8 +163,8 @@
     }
 
     .preview-card {
-      border: 2px solid #e2e8f0;
-      border-radius: 8px;
+      border: 1px solid #d4d4d4;
+      border-radius: 6px;
       padding: 10px;
       text-align: center;
     }
@@ -171,50 +177,35 @@
 
     .preview-card .ratio-label {
       font-size: 12px;
-      color: #718096;
+      color: #666666;
       font-weight: 500;
     }
 
     .info-box {
-      background: #edf2f7;
+      background: #fafafa;
       padding: 15px;
-      border-radius: 8px;
+      border-radius: 6px;
       margin-bottom: 20px;
       font-size: 13px;
-      color: #4a5568;
+      color: #666666;
       line-height: 1.5;
+      border: 1px solid #e5e5e5;
     }
 
     .info-box strong {
-      color: #2d3748;
+      color: #000000;
     }
   </style>
 </head>
 <body>
   <div class="container">
-    <h1>🚀 Pivot 5 Social Media Test</h1>
+    <img src="pivot-5-logo.png" alt="Pivot 5" class="logo">
+
+    <h1>Social Media Test</h1>
     <p>Generate social media images for all 3 aspect ratios with one click.</p>
 
-    <div class="info-box">
-      <strong>What this does:</strong><br>
-      • Generates 3 aspect ratios (4:5, 1:1, 9:16)<br>
-      • Uses test headline and category<br>
-      • Background image from Unsplash<br>
-      • Tests complete N8N → Edge Function workflow
-    </div>
-
-    <div class="input-group">
-      <label for="webhookUrl">N8N Webhook URL</label>
-      <input
-        type="text"
-        id="webhookUrl"
-        placeholder="https://your-n8n-instance.com/webhook/test-social"
-        value=""
-      >
-    </div>
-
     <button id="testBtn" onclick="runTest()">
-      🎨 Generate Social Media Images
+      Generate Images
     </button>
 
     <div id="status" class="status"></div>
@@ -236,13 +227,8 @@
     }
 
     async function runTest() {
-      const webhookUrl = document.getElementById('webhookUrl').value;
+      const webhookUrl = 'https://persimmons.app.n8n.cloud/webhook/test-social';
       const testBtn = document.getElementById('testBtn');
-
-      if (!webhookUrl) {
-        showStatus('❌ Please enter your N8N webhook URL', 'error');
-        return;
-      }
 
       testBtn.disabled = true;
       showStatus('Generating images...', 'loading');
@@ -268,7 +254,7 @@
 
         const result = await response.json();
 
-        showStatus(`✅ Success! Generated ${result.images?.length || 0} images`, 'success');
+        showStatus(`Success! Generated ${result.images?.length || 0} images`, 'success');
 
         // Display preview images if available
         if (result.images && result.images.length > 0) {
@@ -287,25 +273,12 @@
         console.log('Full response:', result);
 
       } catch (error) {
-        showStatus(`❌ Error: ${error.message}`, 'error');
+        showStatus(`Error: ${error.message}`, 'error');
         console.error('Test failed:', error);
       } finally {
         testBtn.disabled = false;
       }
     }
-
-    // Load saved webhook URL
-    window.addEventListener('DOMContentLoaded', () => {
-      const saved = localStorage.getItem('n8n_webhook_url');
-      if (saved) {
-        document.getElementById('webhookUrl').value = saved;
-      }
-
-      // Save webhook URL on change
-      document.getElementById('webhookUrl').addEventListener('change', (e) => {
-        localStorage.setItem('n8n_webhook_url', e.target.value);
-      });
-    });
   </script>
 </body>
 </html>
