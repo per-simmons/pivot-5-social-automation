@@ -1,0 +1,29 @@
+# Node modules
+node_modules/
+package-lock.json
+
+# Environment variables
+.env
+.env.local
+.env.*.local
+
+# Test outputs
+test-output-*.svg
+test-output-*.png
+
+# OS files
+.DS_Store
+Thumbs.db
+
+# Editor files
+.vscode/
+.idea/
+*.swp
+*.swo
+
+# Supabase local
+.supabase/
+
+# Logs
+*.log
+npm-debug.log*

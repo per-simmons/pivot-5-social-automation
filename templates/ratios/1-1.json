@@ -1,0 +1,62 @@
+{
+  "ratio": "1:1",
+  "name": "Square Post",
+  "width": 1080,
+  "height": 1080,
+  "platform": "linkedin",
+  "layout": {
+    "branding": {
+      "type": "image",
+      "imagePath": "./pivot-5-logo.png",
+      "x": 920,
+      "y": 25,
+      "width": 140,
+      "height": 40
+    },
+    "gradient": {
+      "x1": "0%",
+      "y1": "0%",
+      "x2": "0%",
+      "y2": "100%",
+      "stops": [
+        { "offset": "0%", "color": "#000000", "opacity": 0.0 },
+        { "offset": "40%", "color": "#000000", "opacity": 0.1 },
+        { "offset": "70%", "color": "#000000", "opacity": 0.6 },
+        { "offset": "100%", "color": "#000000", "opacity": 0.92 }
+      ]
+    },
+    "text": {
+      "category": {
+        "x": 40,
+        "y": 820,
+        "fontSize": 16,
+        "fontFamily": "'VCR OSD Mono', 'Courier New', monospace",
+        "fontWeight": "400",
+        "fill": "#FFFFFF",
+        "textAnchor": "start",
+        "letterSpacing": "0.1em"
+      },
+      "headline": {
+        "x": 40,
+        "y": 875,
+        "maxWidth": 1000,
+        "maxHeight": 170,
+        "fontSize": 48,
+        "fontFamily": "Helvetica, Arial, sans-serif",
+        "fontWeight": "bold",
+        "fill": "#FFFFFF",
+        "lineHeight": 1.15,
+        "textAnchor": "start"
+      },
+      "footer": {
+        "x": 40,
+        "y": 1040,
+        "fontSize": 14,
+        "fontFamily": "Arial, sans-serif",
+        "fontWeight": "400",
+        "fill": "#CCCCCC",
+        "textAnchor": "start"
+      }
+    }
+  }
+}

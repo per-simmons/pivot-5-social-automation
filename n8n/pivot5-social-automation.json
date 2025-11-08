@@ -1,0 +1,418 @@
+{
+  "name": "Pivot 5 - Social Media Automation",
+  "nodes": [
+    {
+      "parameters": {
+        "httpMethod": "POST",
+        "path": "publish",
+        "responseMode": "onReceived",
+        "options": {}
+      },
+      "id": "node-webhook",
+      "name": "Webhook Trigger",
+      "type": "n8n-nodes-base.webhook",
+      "typeVersion": 2.1,
+      "position": [250, 300],
+      "webhookId": "pivot5-publish"
+    },
+    {
+      "parameters": {
+        "url": "https://api.openai.com/v1/images/generations",
+        "method": "POST",
+        "authentication": "predefinedCredentialType",
+        "nodeCredentialType": "openAiApi",
+        "sendHeaders": true,
+        "headerParameters": {
+          "parameters": [
+            {
+              "name": "Authorization",
+              "value": "=Bearer {{ $credentials.openAiApi.apiKey }}"
+            }
+          ]
+        },
+        "sendBody": true,
+        "specifyBody": "json",
+        "jsonBody": "={\"model\": \"dall-e-3\",\"prompt\": \"High-contrast editorial background for Pivot 5 post: {{ $json.body.headline }}\",\"size\": \"1024x1024\",\"quality\": \"standard\",\"n\": 1}",
+        "options": {
+          "retry": {
+            "retry": {
+              "maxRetries": 3,
+              "waitBetweenRetries": 3000
+            }
+          },
+          "timeout": 60000
+        }
+      },
+      "id": "node-openai-generate",
+      "name": "Generate OpenAI Image",
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.3,
+      "position": [450, 300]
+    },
+    {
+      "parameters": {
+        "url": "={{ $json.data[0].url }}",
+        "method": "GET",
+        "options": {
+          "response": {
+            "response": {
+              "responseFormat": "file"
+            }
+          }
+        }
+      },
+      "id": "node-download-image",
+      "name": "Download Image Binary",
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.3,
+      "position": [650, 300]
+    },
+    {
+      "parameters": {
+        "url": "={{ $env.SUPABASE_URL }}/storage/v1/object/pivot5/raw/{{ $('Webhook Trigger').item.json.body.postId }}/hero.png",
+        "method": "PUT",
+        "sendHeaders": true,
+        "headerParameters": {
+          "parameters": [
+            {
+              "name": "Authorization",
+              "value": "=Bearer {{ $env.SUPABASE_SERVICE_ROLE_KEY }}"
+            },
+            {
+              "name": "Content-Type",
+              "value": "image/png"
+            }
+          ]
+        },
+        "sendBody": true,
+        "contentType": "binaryData",
+        "options": {
+          "retry": {
+            "retry": {
+              "maxRetries": 2,
+              "waitBetweenRetries": 2000
+            }
+          }
+        }
+      },
+      "id": "node-upload-raw",
+      "name": "Upload to Supabase Storage",
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.3,
+      "position": [850, 300]
+    },
+    {
+      "parameters": {
+        "batchSize": 1,
+        "options": {}
+      },
+      "id": "node-split-batches",
+      "name": "Split Ratios",
+      "type": "n8n-nodes-base.splitInBatches",
+      "typeVersion": 3,
+      "position": [1050, 300]
+    },
+    {
+      "parameters": {
+        "jsCode": "// Create array of ratios to process\nconst ratios = [\n  { ratio: '4:5' },\n  { ratio: '1:1' },\n  { ratio: '9:16' }\n];\n\nreturn ratios.map(item => ({ json: item }));"
+      },
+      "id": "node-prepare-ratios",
+      "name": "Prepare Ratios",
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [1250, 300]
+    },
+    {
+      "parameters": {
+        "url": "={{ $env.SUPABASE_URL }}/functions/v1/render_social",
+        "method": "POST",
+        "sendHeaders": true,
+        "headerParameters": {
+          "parameters": [
+            {
+              "name": "Authorization",
+              "value": "=Bearer {{ $env.SUPABASE_SERVICE_ROLE_KEY }}"
+            },
+            {
+              "name": "Content-Type",
+              "value": "application/json"
+            }
+          ]
+        },
+        "sendBody": true,
+        "specifyBody": "json",
+        "jsonBody": "={\"ratio\": \"{{ $json.ratio }}\",\"imageUrl\": \"{{ $env.SUPABASE_URL }}/storage/v1/object/pivot5/raw/{{ $('Webhook Trigger').item.json.body.postId }}/hero.png\",\"headline\": \"{{ $('Webhook Trigger').item.json.body.headline }}\",\"category\": \"{{ $('Webhook Trigger').item.json.body.category }}\",\"footer\": \"{{ $('Webhook Trigger').item.json.body.footer }}\",\"focal\": [0.5, 0.5],\"postId\": \"{{ $('Webhook Trigger').item.json.body.postId }}\"}",
+        "options": {
+          "retry": {
+            "retry": {
+              "maxRetries": 2,
+              "waitBetweenRetries": 3000
+            }
+          },
+          "timeout": 120000
+        }
+      },
+      "id": "node-render-social",
+      "name": "Render Social Image",
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.3,
+      "position": [1450, 300]
+    },
+    {
+      "parameters": {
+        "jsCode": "// Generate platform-specific captions\nconst webhook = $('Webhook Trigger').item.json.body;\nconst headline = webhook.headline;\nconst category = webhook.category;\nconst footer = webhook.footer;\n\nconst captions = {\n  instagram: `${headline}\\n—\\n${footer}`,\n  linkedin: `In this post: ${headline}\\n\\n${category}`,\n  x: `${headline} • pivot5.com`,\n  threads: `${headline}\\n${category}`\n};\n\nreturn [{ json: { captions } }];"
+      },
+      "id": "node-generate-captions",
+      "name": "Generate Captions",
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [1650, 300]
+    },
+    {
+      "parameters": {
+        "url": "=https://api.blotato.com/v1/posts",
+        "method": "POST",
+        "sendHeaders": true,
+        "headerParameters": {
+          "parameters": [
+            {
+              "name": "Authorization",
+              "value": "=Bearer {{ $env.BLOTATO_API_KEY }}"
+            },
+            {
+              "name": "Content-Type",
+              "value": "application/json"
+            }
+          ]
+        },
+        "sendBody": true,
+        "specifyBody": "json",
+        "jsonBody": "={\"platform\": \"instagram\",\"mediaUrl\": \"{{ $('Render Social Image').item.json.publicUrl }}\",\"caption\": \"{{ $json.captions.instagram }}\",\"scheduleAt\": null}",
+        "options": {
+          "retry": {
+            "retry": {
+              "maxRetries": 1,
+              "waitBetweenRetries": 2000
+            }
+          }
+        }
+      },
+      "id": "node-publish-blotato",
+      "name": "Publish to Blotato",
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.3,
+      "position": [1850, 300]
+    },
+    {
+      "parameters": {
+        "url": "={{ $env.SUPABASE_URL }}/rest/v1/post_targets",
+        "method": "POST",
+        "sendHeaders": true,
+        "headerParameters": {
+          "parameters": [
+            {
+              "name": "Authorization",
+              "value": "=Bearer {{ $env.SUPABASE_SERVICE_ROLE_KEY }}"
+            },
+            {
+              "name": "apikey",
+              "value": "={{ $env.SUPABASE_SERVICE_ROLE_KEY }}"
+            },
+            {
+              "name": "Content-Type",
+              "value": "application/json"
+            },
+            {
+              "name": "Prefer",
+              "value": "return=minimal"
+            }
+          ]
+        },
+        "sendBody": true,
+        "specifyBody": "json",
+        "jsonBody": "={\"post_id\": \"{{ $('Webhook Trigger').item.json.body.postId }}\",\"platform\": \"instagram\",\"publish_status\": \"posted\",\"remote_post_id\": \"{{ $('Publish to Blotato').item.json.id }}\",\"published_at\": \"{{ $now.toISO() }}\"}",
+        "options": {}
+      },
+      "id": "node-update-db",
+      "name": "Update Database",
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.3,
+      "position": [2050, 300]
+    },
+    {
+      "parameters": {
+        "url": "={{ $env.SUPABASE_URL }}/rest/v1/posts?id=eq.{{ $('Webhook Trigger').item.json.body.postId }}",
+        "method": "PATCH",
+        "sendHeaders": true,
+        "headerParameters": {
+          "parameters": [
+            {
+              "name": "Authorization",
+              "value": "=Bearer {{ $env.SUPABASE_SERVICE_ROLE_KEY }}"
+            },
+            {
+              "name": "apikey",
+              "value": "={{ $env.SUPABASE_SERVICE_ROLE_KEY }}"
+            },
+            {
+              "name": "Content-Type",
+              "value": "application/json"
+            },
+            {
+              "name": "Prefer",
+              "value": "return=minimal"
+            }
+          ]
+        },
+        "sendBody": true,
+        "specifyBody": "json",
+        "jsonBody": "={\"status\": \"posted\"}",
+        "options": {}
+      },
+      "id": "node-mark-complete",
+      "name": "Mark Post Complete",
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.3,
+      "position": [2250, 300]
+    }
+  ],
+  "connections": {
+    "Webhook Trigger": {
+      "main": [
+        [
+          {
+            "node": "Generate OpenAI Image",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Generate OpenAI Image": {
+      "main": [
+        [
+          {
+            "node": "Download Image Binary",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Download Image Binary": {
+      "main": [
+        [
+          {
+            "node": "Upload to Supabase Storage",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Upload to Supabase Storage": {
+      "main": [
+        [
+          {
+            "node": "Prepare Ratios",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Prepare Ratios": {
+      "main": [
+        [
+          {
+            "node": "Split Ratios",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Split Ratios": {
+      "main": [
+        [
+          {
+            "node": "Render Social Image",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "Generate Captions",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Render Social Image": {
+      "main": [
+        [
+          {
+            "node": "Split Ratios",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Generate Captions": {
+      "main": [
+        [
+          {
+            "node": "Publish to Blotato",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Publish to Blotato": {
+      "main": [
+        [
+          {
+            "node": "Update Database",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Update Database": {
+      "main": [
+        [
+          {
+            "node": "Mark Post Complete",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    }
+  },
+  "settings": {
+    "executionOrder": "v1",
+    "saveManualExecutions": true,
+    "callerPolicy": "workflowsFromSameOwner",
+    "errorWorkflow": ""
+  },
+  "staticData": null,
+  "tags": [
+    {
+      "name": "social-media",
+      "id": "1"
+    },
+    {
+      "name": "automation",
+      "id": "2"
+    }
+  ],
+  "triggerCount": 1,
+  "updatedAt": "2025-11-07T00:00:00.000Z",
+  "versionId": "1"
+}
