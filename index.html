@@ -61,16 +61,18 @@
       font-size: 13px;
     }
 
-    input {
+    input, textarea {
       width: 100%;
       padding: 12px 16px;
       border: 1px solid #d4d4d4;
       border-radius: 6px;
       font-size: 14px;
       transition: border-color 0.2s;
+      font-family: inherit;
+      resize: vertical;
     }
 
-    input:focus {
+    input:focus, textarea:focus {
       outline: none;
       border-color: #000000;
     }
@@ -204,6 +206,16 @@
     <h1>Social Media Test</h1>
     <p>Generate social media images for all 3 aspect ratios with one click.</p>
 
+    <div class="input-group">
+      <label for="categoryInput">Category Label (required)</label>
+      <input id="categoryInput" type="text" placeholder="e.g. TOOLS" value="TOOLS">
+    </div>
+
+    <div class="input-group">
+      <label for="headlineInput">Headline (leave blank to auto-generate)</label>
+      <textarea id="headlineInput" rows="3" placeholder="Enter a custom headline"></textarea>
+    </div>
+
     <button id="testBtn" onclick="runTest()">
       Generate Images
     </button>
@@ -228,6 +240,8 @@
 
     async function runTest() {
       const webhookUrl = 'https://persimmons.app.n8n.cloud/webhook/test-social';
+      const categoryValue = document.getElementById('categoryInput').value.trim() || 'TOOLS';
+      const headlineValue = document.getElementById('headlineInput').value.trim();
       const testBtn = document.getElementById('testBtn');
 
       testBtn.disabled = true;
@@ -241,8 +255,8 @@
             'Content-Type': 'application/json',
           },
           body: JSON.stringify({
-            category: "TOOLS",
-            headline: "Testing AI-Powered Social Media Automation",
+            category: categoryValue,
+            headline: headlineValue,
             imageUrl: "https://images.unsplash.com/photo-1518770660439-4636190af475?w=1200&q=80",
             postId: `test-${Date.now()}`
           })
